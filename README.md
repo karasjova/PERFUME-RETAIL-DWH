@@ -14,4 +14,4 @@ The repository contains the following files and directories:
 
 **·** **bl_dm/**: a directory containing SQL scripts for the business layer data mart.
 
-Business_Template_Kseniya_Karasjova.pdf describes the business case, problems, benefits, DWH design and ETL process.
+**Business_Template_Kseniya_Karasjova.pdf** describes the business case, problems, benefits, DWH design and ETL process.
