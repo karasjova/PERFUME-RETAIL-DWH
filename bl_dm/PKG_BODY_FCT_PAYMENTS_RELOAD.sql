@@ -1,0 +1,75 @@
+-------------------------------
+CREATE OR REPLACE PACKAGE BODY PKG_LOAD_FCT_PAYMENTS_RELOAD AS
+
+PROCEDURE PROC_LOAD_FCT_PAYMENTS_RELOAD (start_dt_in IN DATE) IS
+
+    L_PROCEDURE_NAME    VARCHAR2(2000) := 'PROC_LOAD_FCT_PAYMENTS_RELOAD';
+    L_TABLE_NAME        VARCHAR2(2000) := 'FCT_PAYMENTS';
+    L_ROWS_PROCESSED    NUMBER;
+    L_CONTEXT           VARCHAR2(2000) := 'LOADING FCT_PAYMENTS STARTS';
+    start_dt_var        date := start_dt_in;
+    START_DT            timestamp:= localtimestamp;
+    end_dt              timestamp;
+    
+
+    
+BEGIN
+
+INSERT INTO FCT_PAYMENTS (  STORE_SURR_ID,
+                            EMPLOYEE_SURR_ID,
+                            CUSTOMER_SURR_ID,
+                            PRODUCT_SURR_ID,
+                            SALES_CHANNEL_SURR_ID,
+                            PAYMENT_TYPE_SURR_ID,
+                            PAYMENT_DATE,
+                            AMOUNT_PAID,
+                            PRODUCT_QTY,
+                            ORDER_NO,
+                            INSERT_DT,
+                            UPDATE_DT)
+
+SELECT 
+            S.STORE_SURR_ID          AS STORE_SURR_ID, 
+            E.EMPLOYEE_SURR_ID       AS EMPLOYEE_SURR_ID,
+            C.CUSTOMER_SURR_ID       AS CUSTOMER_SURR_ID,
+            P.PRODUCT_SURR_ID        AS PRODUCT_SURR_ID,
+            CH.SALES_CHANNEL_SURR_ID AS SALES_CHANNEL_SURR_ID,
+            PT.PAYMENT_TYPE_SURR_ID  AS PAYMENT_TYPE_SURRID,
+            PP.TRANSACTION_DATE       AS PAYMENT_DATE,
+            PP.PAID_TOTAL             AS AMOUNT_PAID,
+            PP.QUANTITY               AS PRODUCT_QTY,
+            PP.ORDER_NO               AS ORDER_NO,
+            SYSDATE                   AS INSERT_DT,
+            SYSDATE                   AS UPDATE_DT
+         FROM
+            BL_3NF.CE_PAYMENTS PP   
+            LEFT JOIN  DIM_PRODUCTS P ON PP.PRODUCT_ID = P.PRODUCT_ID
+            LEFT JOIN DIM_CUSTOMERS C ON PP.CUSTOMER_ID = C.CUSTOMER_ID
+            LEFT JOIN DIM_STORES S ON UPPER(PP.STORE_ID) = UPPER(S.STORE_ID)
+            LEFT JOIN DIM_EMPLOYEES_SCD E ON PP.EMPOYEE_ID = E.EMPLOYEE_ID 
+            LEFT JOIN DIM_PAYMENT_TYPES PT ON UPPER(PP.PAYMENT_TYPE_ID) = UPPER(PT.PAYMENT_TYPE_ID)
+            LEFT JOIN DIM_SALES_CHANNELS CH ON UPPER(PP.SALES_CHANNEL_ID) = UPPER(PT.SALES_CHANNEL_ID
+            WHERE PP.INSERT_DT <> FCT_PAYMENTS.INSERT_DT;
+           
+
+L_ROWS_PROCESSED := SQL%ROWCOUNT;
+L_CONTEXT := 'LOADING FCT_PAYMENTS FINISHED';
+PROC_LOG(L_PACKAGE_NAME, L_PROCEDURE_NAME, L_TABLE_NAME, L_CONTEXT, 'PROCEDURE END', L_ROWS_PROCESSED, SYSDATE);
+
+COMMIT;
+
+EXCEPTION 
+    WHEN OTHERS THEN 
+        L_CONTEXT := 'ERROR LOADING FCT_PAYMENTS';
+        PROC_LOG(L_PACKAGE_NAME, L_PROCEDURE_NAME, L_TABLE_NAME, L_CONTEXT, 'ERROR', NULL, SYSDATE);
+        ROLLBACK;
+        RAISE;
+    
+END PROC_LOAD_FCT_PAYMENTS_INIT;
+          
+BEGIN
+PKG_LOAD_FCT_PAYMENTS_INIT;
+END;
+ /
+
+

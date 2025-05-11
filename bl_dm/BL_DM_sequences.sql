@@ -1,0 +1,13 @@
+CREATE SEQUENCE dim_pay_type_seq START WITH 1;
+
+CREATE SEQUENCE dim_store_seq START WITH 1;
+
+CREATE SEQUENCE dim_prod_seq START WITH 1;
+
+CREATE SEQUENCE dim_sales_ch_seq START WITH 1;
+
+CREATE SEQUENCE dim_date_seq START WITH 1;
+
+CREATE SEQUENCE dim_cust_seq START WITH 1;
+ 
+CREATE SEQUENCE dim_emp_seq START WITH 1;
