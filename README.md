@@ -9,5 +9,7 @@ This repository contains the design and implementation of a Data Warehouse (DWH)
 The repository contains the following files and directories:
 
 **·** **3nf_pkgs/**: a directory containing SQL packages for loading data into the 3NF staging layer;
+
 **·** **3nf_additional/**: a directory containing additional scripts for the 3NF staging layer;
+
 **·** **bl_dm/**: a directory containing SQL scripts for the business layer data mart. 
